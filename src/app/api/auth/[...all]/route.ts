@@ -17,7 +17,10 @@ const aj = arcjet({
   rules: [shield({ mode: "LIVE" })],
 });
 
-const botSettings = { mode: "LIVE", allow: [] } satisfies BotOptions;
+const botSettings = {
+  mode: "LIVE",
+  allow: ["STRIPE_WEBHOOK"],
+} satisfies BotOptions;
 const restrictiveRateLimitSettings = {
   mode: "LIVE",
   max: 10,
@@ -34,7 +37,6 @@ const emailSettings = {
 } satisfies EmailOptions;
 
 const authHandlers = toNextJsHandler(auth);
-
 export const { GET } = authHandlers;
 
 export async function POST(request: Request) {
@@ -63,7 +65,7 @@ export async function POST(request: Request) {
     }
   }
 
-  return authHandlers.POST(request);
+  return authHandlers.POST(clonedRequest);
 }
 
 async function checkArcjet(request: Request) {
@@ -74,9 +76,9 @@ async function checkArcjet(request: Request) {
   if (request.url.endsWith("/auth/sign-up")) {
     if (
       body &&
-      typeof body == "object" &&
+      typeof body === "object" &&
       "email" in body &&
-      typeof body.email == "string"
+      typeof body.email === "string"
     ) {
       return aj
         .withRule(

@@ -1,9 +1,17 @@
 "use client";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useState } from "react";
 import { SignInTab } from "./_components/sign-in-tab";
 import { SignUpTab } from "./_components/sign-up-tab";
+import { SocialAuthButtons } from "./_components/social-auth-buttons";
 
 type Tab = "signin" | "signup" | "email-verification" | "forgot-password";
 
@@ -29,6 +37,10 @@ export default function LoginPage() {
           <CardContent>
             <SignInTab />
           </CardContent>
+          <Separator />
+          <CardFooter className="grid grid-cols-2 gap-3">
+            <SocialAuthButtons />
+          </CardFooter>
         </Card>
       </TabsContent>
 
@@ -40,6 +52,10 @@ export default function LoginPage() {
           <CardContent>
             <SignUpTab />
           </CardContent>
+          <Separator />
+          <CardFooter className="grid grid-cols-2 gap-3">
+            <SocialAuthButtons />
+          </CardFooter>
         </Card>
       </TabsContent>
     </Tabs>
