@@ -1,5 +1,5 @@
 "use client";
-import { Button } from "@/components/ui/button";
+import { BetterAuthActionButton } from "@/components/auth/better-auth-action-button";
 import { authClient } from "@/lib/auth-client";
 import {
   SUPPORTED_OAUTH_PROVIDERS,
@@ -11,14 +11,16 @@ export function SocialAuthButtons() {
     const Icon = SUPPORTEDOAUTH_PROVIDERDETAILS[provider].Icon;
 
     return (
-      <Button
+      <BetterAuthActionButton
         variant="outline"
         key={provider}
-        onClick={() => authClient.signIn.social({ provider, callbackURL: "/" })}
+        action={() => {
+          return authClient.signIn.social({ provider, callbackURL: "/" });
+        }}
       >
         <Icon />
         {SUPPORTEDOAUTH_PROVIDERDETAILS[provider].name}
-      </Button>
+      </BetterAuthActionButton>
     );
   });
 }
