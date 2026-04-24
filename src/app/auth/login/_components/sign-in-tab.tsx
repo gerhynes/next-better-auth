@@ -26,7 +26,11 @@ const SignInSchema = z.object({
 
 type SignInForm = z.infer<typeof SignInSchema>;
 
-export function SignInTab() {
+export function SignInTab({
+  openEmailVerificationTab,
+}: {
+  openEmailVerificationTab: (email: string) => void;
+}) {
   const router = useRouter();
   const form = useForm<SignInForm>({
     resolver: zodResolver(SignInSchema),
@@ -43,6 +47,9 @@ export function SignInTab() {
       { ...data, callbackURL: "/" },
       {
         onError: (error) => {
+          if (error.error.code == "EMAIL_NOT_VERIFIED") {
+            openEmailVerificationTab(data.email);
+          }
           toast.error(error.error.message || "Failed to sign in");
         },
         onSuccess: () => {
