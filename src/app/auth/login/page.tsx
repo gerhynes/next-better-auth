@@ -12,6 +12,7 @@ import { authClient } from "@/lib/auth-client";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { EmailVerification } from "./_components/email-verification";
+import { ForgotPassword } from "./_components/forgot-password";
 import { SignInTab } from "./_components/sign-in-tab";
 import { SignUpTab } from "./_components/sign-up-tab";
 import { SocialAuthButtons } from "./_components/social-auth-buttons";
@@ -52,7 +53,10 @@ export default function LoginPage() {
             <CardTitle>Sign In</CardTitle>
           </CardHeader>
           <CardContent>
-            <SignInTab openEmailVerificationTab={openEmailVerificationTab} />
+            <SignInTab
+              openEmailVerificationTab={openEmailVerificationTab}
+              openForgotPassword={() => setSelectedTab("forgot-password")}
+            />
           </CardContent>
           <Separator />
           <CardFooter className="grid grid-cols-2 gap-3">
@@ -93,7 +97,7 @@ export default function LoginPage() {
             <CardTitle>Forgot Password</CardTitle>
           </CardHeader>
           <CardContent>
-            <ForgotPassword openSignIn={() => setSelectedTab("signin")} />
+            <ForgotPassword openSignInTab={() => setSelectedTab("signin")} />
           </CardContent>
         </Card>
       </TabsContent>

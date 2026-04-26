@@ -1,53 +1,90 @@
-import { BetterAuthActionButton } from "@/components/auth/better-auth-action-button";
+"use client";
+
+import { Button } from "@/components/ui/button";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { LoadingSwap } from "@/components/ui/loading-swap";
 import { authClient } from "@/lib/auth-client";
-import { useEffect, useRef, useState } from "react";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import { toast } from "sonner";
+import z from "zod";
 
-export function EmailVerification({ email }: { email: string }) {
-  const [timeToNextResend, setTimeToNextResend] = useState(30);
-  const interval = useRef<NodeJS.Timeout>(undefined);
+const forgotPasswordSchema = z.object({
+  email: z.email().min(1),
+});
 
-  useEffect(() => {
-    startEmailVerificationCountdown();
+type ForgotPasswordForm = z.infer<typeof forgotPasswordSchema>;
+
+export function ForgotPassword({
+  openSignInTab,
+}: {
+  openSignInTab: () => void;
+}) {
+  const form = useForm<ForgotPasswordForm>({
+    resolver: zodResolver(forgotPasswordSchema),
+    defaultValues: {
+      email: "",
+    },
   });
 
-  function startEmailVerificationCountdown(time = 30) {
-    setTimeToNextResend(time);
-    interval.current = setInterval(() => {
-      setTimeToNextResend((t) => {
-        const newT = t - 1;
-        if (newT <= 0) {
-          clearInterval(interval.current);
-          return 0;
-        }
-        return newT;
-      });
-    }, 1000);
+  const { isSubmitting } = form.formState;
+
+  async function handleForgotPassword(data: ForgotPasswordForm) {
+    await authClient.requestPasswordReset(
+      {
+        ...data,
+        redirectTo: "/auth/reset-password",
+      },
+      {
+        onError: (error) => {
+          toast.error(
+            error.error.message || "Failed to send password reset email",
+          );
+        },
+        onSuccess: () => {
+          toast.success("Password reset email sent");
+        },
+      },
+    );
   }
 
   return (
-    <div className="space-y-4">
-      <p className="text-sm text-muted-foreground mt-2">
-        W esent you a verification link. Please check your email and click the
-        link to verify your account.
-      </p>
-
-      <BetterAuthActionButton
-        variant="outline"
-        className="w-full"
-        successMessage="Verification email sent!"
-        disabled={timeToNextResend > 0}
-        action={() => {
-          startEmailVerificationCountdown();
-          return authClient.sendVerificationEmail({
-            email,
-            callbackURL: "/",
-          });
-        }}
+    <Form {...form}>
+      <form
+        className="space-y-4"
+        onSubmit={form.handleSubmit(handleForgotPassword)}
       >
-        {timeToNextResend > 0
-          ? `Resend Email (${timeToNextResend})`
-          : `Resend Email`}
-      </BetterAuthActionButton>
-    </div>
+        <FormField
+          control={form.control}
+          name="email"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Email</FormLabel>
+              <FormControl>
+                <Input type="email" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <div className="flex gap-2">
+          <Button type="button" variant="outline" onClick={openSignInTab}>
+            Back
+          </Button>
+          <Button type="submit" disabled={isSubmitting} className="flex-1">
+            <LoadingSwap isLoading={isSubmitting}>Send Reset Email</LoadingSwap>
+          </Button>
+        </div>
+      </form>
+    </Form>
   );
 }
