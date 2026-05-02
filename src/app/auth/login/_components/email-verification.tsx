@@ -28,7 +28,7 @@ export function EmailVerification({ email }: { email: string }) {
   return (
     <div className="space-y-4">
       <p className="text-sm text-muted-foreground mt-2">
-        W esent you a verification link. Please check your email and click the
+        We sent you a verification link. Please check your email and click the
         link to verify your account.
       </p>
 
