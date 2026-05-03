@@ -3,11 +3,20 @@ import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { createAuthMiddleware } from "better-auth/api";
 import { nextCookies } from "better-auth/next-js";
-import { sendEmailVerificationEmail } from "./email/email-verification";
-import { sendPasswordResetEmail } from "./email/password-reset-email";
-import { sendWelcomeEmail } from "./email/welcome-email";
+import { sendEmailVerificationEmail } from "../email/email-verification";
+import { sendPasswordResetEmail } from "../email/password-reset-email";
+import { sendWelcomeEmail } from "../email/welcome-email";
 
 export const auth = betterAuth({
+  user: {
+    additionalFields: {
+      favoriteNumber: {
+        type: "number",
+        required: true,
+        defaultValue: 0,
+      },
+    },
+  },
   emailAndPassword: {
     enabled: true,
     requireEmailVerification: true,
@@ -26,10 +35,20 @@ export const auth = betterAuth({
     github: {
       clientId: process.env.GITHUB_CLIENT_ID!,
       clientSecret: process.env.GITHUB_CLIENT_SECRET,
+      mapProfileToUser: (profile) => {
+        return {
+          favoriteNumber: Number(profile.public_repos) || 0,
+        };
+      },
     },
     discord: {
       clientId: process.env.DISCORD_CLIENT_ID!,
       clientSecret: process.env.DISCORD_CLIENT_SECRET,
+      mapProfileToUser: () => {
+        return {
+          favoriteNumber: 0,
+        };
+      },
     },
   },
   session: {
