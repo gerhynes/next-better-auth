@@ -26,6 +26,11 @@ export default function Home() {
           <h1 className="text-center space-y-6 text-3xl">
             Welcome {session.user.name}
           </h1>
+          <div className="flex gap-4 justify-center">
+            <Button asChild size="lg">
+              <Link href="/profile">Profile</Link>
+            </Button>
+          </div>
           <BetterAuthActionButton
             size="lg"
             variant="destructive"

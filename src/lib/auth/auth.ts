@@ -1,14 +1,31 @@
 import { db } from "@/drizzle/db";
+import { passkey } from "@better-auth/passkey";
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { createAuthMiddleware } from "better-auth/api";
 import { nextCookies } from "better-auth/next-js";
+import { twoFactor } from "better-auth/plugins/two-factor";
 import { sendEmailVerificationEmail } from "../email/email-verification";
 import { sendPasswordResetEmail } from "../email/password-reset-email";
 import { sendWelcomeEmail } from "../email/welcome-email";
 
 export const auth = betterAuth({
   user: {
+    changeEmail: {
+      enabled: true,
+      sendChangeEmailVerification: async ({ user, url, newEmail }) => {
+        await sendEmailVerificationEmail({
+          user: { ...user, email: newEmail },
+          url,
+        });
+      },
+    },
+    deleteUser: {
+      enabled: true,
+      sendDeleteAccountVerification: async ({ user, url }) => {
+        await sendDeleteAccountVerificationEmail({ user, url });
+      },
+    },
     additionalFields: {
       favoriteNumber: {
         type: "number",
@@ -57,7 +74,7 @@ export const auth = betterAuth({
       maxAge: 60 * 5, // 5 minutes
     },
   },
-  plugins: [nextCookies()],
+  plugins: [nextCookies(), twoFactor(), passkey()],
   database: drizzleAdapter(db, {
     provider: "pg",
   }),
