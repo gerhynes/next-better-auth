@@ -1,3 +1,4 @@
+import { passkeyClient } from "@better-auth/passkey/client";
 import {
   inferAdditionalFields,
   twoFactorClient,
@@ -13,5 +14,6 @@ export const authClient = createAuthClient({
         window.location.href = "/auth/2fa";
       },
     }),
+    passkeyClient(),
   ],
 });

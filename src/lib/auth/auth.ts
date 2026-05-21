@@ -5,6 +5,7 @@ import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { createAuthMiddleware } from "better-auth/api";
 import { nextCookies } from "better-auth/next-js";
 import { twoFactor } from "better-auth/plugins/two-factor";
+import { sendDeleteAccountVerificationEmail } from "../email/delete-account-verification";
 import { sendEmailVerificationEmail } from "../email/email-verification";
 import { sendPasswordResetEmail } from "../email/password-reset-email";
 import { sendWelcomeEmail } from "../email/welcome-email";
