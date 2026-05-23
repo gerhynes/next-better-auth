@@ -1,3 +1,4 @@
+import { ImpersonationIndicator } from "@/components/auth/impersonation-indicator";
 import { Toaster } from "@/components/ui/sonner";
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
@@ -31,6 +32,7 @@ export default function RootLayout({
       <body className="min-h-full flex flex-col">
         {children}
         <Toaster position="top-left" />
+        <ImpersonationIndicator />
       </body>
     </html>
   );
