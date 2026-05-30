@@ -18,6 +18,7 @@ import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import z from "zod";
+import { PasskeyButton } from "./passkey-button";
 
 const SignInSchema = z.object({
   email: z.email().min(1),

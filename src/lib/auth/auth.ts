@@ -1,22 +1,45 @@
 import { ac, admin, user } from "@/components/auth/permissions";
 import { db } from "@/drizzle/db";
+import { member } from "@/drizzle/schema";
 import { passkey } from "@better-auth/passkey";
+import { stripe } from "@better-auth/stripe";
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { createAuthMiddleware } from "better-auth/api";
 import { nextCookies } from "better-auth/next-js";
+import { organization } from "better-auth/plugins";
 import { admin as adminPlugin } from "better-auth/plugins/admin";
 import { twoFactor } from "better-auth/plugins/two-factor";
+import { and, desc, eq } from "drizzle-orm";
+import Stripe from "stripe";
 import { sendDeleteAccountVerificationEmail } from "../email/delete-account-verification";
 import { sendEmailVerificationEmail } from "../email/email-verification";
+import { sendOrganizationInviteEmail } from "../email/organization-invite-email";
 import { sendPasswordResetEmail } from "../email/password-reset-email";
 import { sendWelcomeEmail } from "../email/welcome-email";
+import { STRIPE_PLANS } from "./stripe";
+
+const stripeClient = new Stripe(process.env.STRIPE_SECRET_KEY!, {
+  apiVersion: "2025-08-27.basil",
+});
 
 export const auth = betterAuth({
+  appName: "Better Auth Demo",
   user: {
     changeEmail: {
       enabled: true,
-      sendChangeEmailVerification: async ({ user, url, newEmail }) => {
+      sendChangeEmailVerification: async ({
+        user,
+        url,
+        newEmail,
+      }: {
+        user: {
+          name: string;
+          email: string;
+        };
+        url: string;
+        newEmail: string;
+      }) => {
         await sendEmailVerificationEmail({
           user: { ...user, email: newEmail },
           url,
@@ -54,7 +77,7 @@ export const auth = betterAuth({
   socialProviders: {
     github: {
       clientId: process.env.GITHUB_CLIENT_ID!,
-      clientSecret: process.env.GITHUB_CLIENT_SECRET,
+      clientSecret: process.env.GITHUB_CLIENT_SECRET!,
       mapProfileToUser: (profile) => {
         return {
           favoriteNumber: Number(profile.public_repos) || 0,
@@ -63,7 +86,7 @@ export const auth = betterAuth({
     },
     discord: {
       clientId: process.env.DISCORD_CLIENT_ID!,
-      clientSecret: process.env.DISCORD_CLIENT_SECRET,
+      clientSecret: process.env.DISCORD_CLIENT_SECRET!,
       mapProfileToUser: () => {
         return {
           favoriteNumber: 0,
@@ -88,6 +111,48 @@ export const auth = betterAuth({
         user,
       },
     }),
+    organization({
+      sendInvitationEmail: async ({
+        email,
+        organization,
+        inviter,
+        invitation,
+      }) => {
+        await sendOrganizationInviteEmail({
+          invitation,
+          inviter: inviter.user,
+          organization,
+          email,
+        });
+      },
+    }),
+    stripe({
+      stripeClient,
+      stripeWebhookSecret: process.env.STRIPE_WEBHOOK_SECRET!,
+      createCustomerOnSignUp: true,
+      subscription: {
+        authorizeReference: async ({ user, referenceId, action }) => {
+          const memberItem = await db.query.member.findFirst({
+            where: and(
+              eq(member.organizationId, referenceId),
+              eq(member.userId, user.id),
+            ),
+          });
+
+          if (
+            action === "upgrade-subscription" ||
+            action === "cancel-subscription" ||
+            action === "restore-subscription"
+          ) {
+            return memberItem?.role === "owner";
+          }
+
+          return memberItem != null;
+        },
+        enabled: true,
+        plans: STRIPE_PLANS,
+      },
+    }),
   ],
   database: drizzleAdapter(db, {
     provider: "pg",
@@ -104,5 +169,25 @@ export const auth = betterAuth({
         }
       }
     }),
+  },
+  databaseHooks: {
+    session: {
+      create: {
+        before: async (userSession) => {
+          const membership = await db.query.member.findFirst({
+            where: eq(member.userId, userSession.userId),
+            orderBy: desc(member.createdAt),
+            columns: { organizationId: true },
+          });
+
+          return {
+            data: {
+              ...userSession,
+              activeOrganizationId: membership?.organizationId,
+            },
+          };
+        },
+      },
+    },
   },
 });

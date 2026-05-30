@@ -13,7 +13,7 @@ export default function Home() {
   useEffect(() => {
     authClient.admin
       .hasPermission({
-        permission: {
+        permissions: {
           user: ["list"],
         },
       })
@@ -43,6 +43,9 @@ export default function Home() {
           <div className="flex gap-4 justify-center">
             <Button asChild size="lg">
               <Link href="/profile">Profile</Link>
+            </Button>
+            <Button asChild size="lg" variant="outline">
+              <Link href="/organizations">Organizations</Link>
             </Button>
             {hasAdminPermission && (
               <Button asChild size="lg" variant="outline">

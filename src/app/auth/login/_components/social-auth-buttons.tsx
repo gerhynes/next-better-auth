@@ -3,12 +3,12 @@ import { BetterAuthActionButton } from "@/components/auth/better-auth-action-but
 import { authClient } from "@/lib/auth/auth-client";
 import {
   SUPPORTED_OAUTH_PROVIDERS,
-  SUPPORTEDOAUTH_PROVIDERDETAILS,
+  SUPPORTED_OAUTH_PROVIDER_DETAILS,
 } from "@/lib/auth/oauth-providers";
 
 export function SocialAuthButtons() {
   return SUPPORTED_OAUTH_PROVIDERS.map((provider) => {
-    const Icon = SUPPORTEDOAUTH_PROVIDERDETAILS[provider].Icon;
+    const Icon = SUPPORTED_OAUTH_PROVIDER_DETAILS[provider].Icon;
 
     return (
       <BetterAuthActionButton
@@ -19,7 +19,7 @@ export function SocialAuthButtons() {
         }}
       >
         <Icon />
-        {SUPPORTEDOAUTH_PROVIDERDETAILS[provider].name}
+        {SUPPORTED_OAUTH_PROVIDER_DETAILS[provider].name}
       </BetterAuthActionButton>
     );
   });

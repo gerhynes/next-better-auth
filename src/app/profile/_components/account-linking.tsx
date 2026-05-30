@@ -1,3 +1,4 @@
+"use client";
 import { BetterAuthActionButton } from "@/components/auth/better-auth-action-button";
 import { Card, CardContent } from "@/components/ui/card";
 import { auth } from "@/lib/auth/auth";
