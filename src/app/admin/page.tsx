@@ -6,13 +6,14 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import {
+  Table,
   TableBody,
   TableHead,
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
 import { auth } from "@/lib/auth/auth";
-import { ArrowLeft, Table, Users } from "lucide-react";
+import { ArrowLeft, Users } from "lucide-react";
 import { headers } from "next/headers";
 import Link from "next/link";
 import { redirect } from "next/navigation";
@@ -59,7 +60,7 @@ export default async function AdminPage() {
                   <TableHead>User</TableHead>
                   <TableHead>Role</TableHead>
                   <TableHead>Created</TableHead>
-                  <TableHead className="w-[100px]">Actions</TableHead>
+                  <TableHead className="w-25">Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>

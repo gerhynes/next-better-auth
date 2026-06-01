@@ -1,4 +1,5 @@
 "use client";
+
 import { BetterAuthActionButton } from "@/components/auth/better-auth-action-button";
 import { Card, CardContent } from "@/components/ui/card";
 import { auth } from "@/lib/auth/auth";
@@ -8,7 +9,7 @@ import {
   SUPPORTED_OAUTH_PROVIDERS,
   SupportedOAuthProvider,
 } from "@/lib/auth/oauth-providers";
-import { Shield, Trash2 } from "lucide-react";
+import { Plus, Shield, Trash2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 
 type Account = Awaited<ReturnType<typeof auth.api.listUserAccounts>>[number];
@@ -22,6 +23,7 @@ export function AccountLinking({
     <div className="space-y-6">
       <div className="space-y-2">
         <h3 className="text-lg font-medium">Linked Accounts</h3>
+
         {currentAccounts.length === 0 ? (
           <Card>
             <CardContent className="py-8 text-center text-secondary-muted">
@@ -102,36 +104,39 @@ function AccountCard({
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-3">
             {<providerDetails.Icon className="size-5" />}
-            <p className="font-medium">{providerDetails.name}</p>
-            {account == null ? (
-              <p className="text-sm text-muted-foreground">
-                Connect your {providerDetails.name} account for easier sign-in
-              </p>
-            ) : (
-              <p className="text-sm text-muted-foreground">
-                Linked on {new Date(account.createdAt).toLocaleDateString()}
-              </p>
-            )}
+            <div>
+              <p className="font-medium">{providerDetails.name}</p>
+              {account == null ? (
+                <p className="text-sm text-muted-foreground">
+                  Connect your {providerDetails.name} account for easier sign-in
+                </p>
+              ) : (
+                <p className="text-sm text-muted-foreground">
+                  Linked on {new Date(account.createdAt).toLocaleDateString()}
+                </p>
+              )}
+            </div>
           </div>
+          {account == null ? (
+            <BetterAuthActionButton
+              variant="outline"
+              size="sm"
+              action={linkAccount}
+            >
+              <Plus />
+              Link
+            </BetterAuthActionButton>
+          ) : (
+            <BetterAuthActionButton
+              variant="destructive"
+              size="sm"
+              action={unlinkAccount}
+            >
+              <Trash2 />
+              Unlink
+            </BetterAuthActionButton>
+          )}
         </div>
-        {account == null ? (
-          <BetterAuthActionButton
-            variant="outline"
-            size="sm"
-            action={linkAccount}
-          >
-            Link
-          </BetterAuthActionButton>
-        ) : (
-          <BetterAuthActionButton
-            variant="destructive"
-            size="sm"
-            action={unlinkAccount}
-          >
-            <Trash2 />
-            Unlink
-          </BetterAuthActionButton>
-        )}
       </CardContent>
     </Card>
   );

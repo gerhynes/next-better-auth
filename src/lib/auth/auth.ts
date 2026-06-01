@@ -101,7 +101,6 @@ export const auth = betterAuth({
     },
   },
   plugins: [
-    nextCookies(),
     twoFactor(),
     passkey(),
     adminPlugin({
@@ -153,6 +152,7 @@ export const auth = betterAuth({
         plans: STRIPE_PLANS,
       },
     }),
+    nextCookies(),
   ],
   database: drizzleAdapter(db, {
     provider: "pg",

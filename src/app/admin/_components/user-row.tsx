@@ -106,6 +106,7 @@ export function UserRow({
         },
         onSuccess: () => {
           toast.success("User deleted");
+          router.refresh();
         },
       },
     );
@@ -158,6 +159,7 @@ export function UserRow({
                   </DropdownMenuItem>
                 )}
                 <DropdownMenuSeparator />
+
                 <AlertDialogTrigger asChild>
                   <DropdownMenuItem variant="destructive">
                     Delete User

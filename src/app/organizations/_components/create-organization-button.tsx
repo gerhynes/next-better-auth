@@ -88,7 +88,7 @@ export function CreateOrganizationButton() {
                 <FormItem>
                   <FormLabel>Name</FormLabel>
                   <FormControl>
-                    <Input type="email" {...field} />
+                    <Input {...field} />
                   </FormControl>
                 </FormItem>
               )}
